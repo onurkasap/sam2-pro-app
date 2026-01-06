@@ -1,0 +1,16 @@
+# Python gereksizleri
+__pycache__/
+*.py[cod]
+.venv
+venv/
+env/
+
+# VS Code ayarları
+.vscode/
+
+# Proje özel klasörleri
+checkpoints/
+uploads/
+temp_frames/
+processed/
+processed_frames/

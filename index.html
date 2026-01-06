@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SAM 2 AI Studio</title>
+    <style>
+        /* Modern Dark Theme Styling */
+        body { 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background-color: #121212; 
+            color: #e0e0e0; 
+            text-align: center; 
+            margin: 0; 
+            padding: 20px; 
+        }
+        
+        h1 { 
+            margin-bottom: 5px; 
+            font-weight: 300;
+            color: #ffffff;
+            letter-spacing: 1px;
+        }
+
+        /* Branding / Credits Area */
+        .credits {
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+            color: #a0a0a0;
+        }
+        .credits a {
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+        .credits a:hover {
+            color: #81c784;
+            text-decoration: underline;
+        }
+        .github-icon {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            background-color: #4CAF50; /* Placeholder for icon */
+            mask: url('https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png') no-repeat center / contain;
+            -webkit-mask: url('https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png') no-repeat center / contain;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+
+        .container { 
+            max-width: 900px; 
+            margin: auto; 
+            background: #1e1e1e; 
+            padding: 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6); 
+        }
+        
+        /* Tabs Styling */
+        .tabs { 
+            display: flex; 
+            justify-content: center; 
+            margin-bottom: 25px; 
+            border-bottom: 2px solid #333; 
+        }
+        .tab-btn { 
+            background: none; 
+            border: none; 
+            color: #777; 
+            padding: 12px 25px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .tab-btn:hover { color: #bbb; }
+        .tab-btn.active { 
+            color: #4CAF50; 
+            border-bottom: 3px solid #4CAF50; 
+        }
+        .tab-content { display: none; animation: fadeIn 0.5s; }
+        .tab-content.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Input & Preview Area */
+        input[type="file"] {
+            margin: 15px 0;
+            padding: 10px;
+            background: #2d2d2d;
+            border-radius: 5px;
+            border: 1px solid #444;
+            color: #ddd;
+        }
+
+        .preview-area { 
+            position: relative; 
+            display: inline-block; 
+            margin-top: 15px; 
+            border: 2px dashed #444; 
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        img { 
+            max-width: 100%; 
+            display: block; 
+            cursor: crosshair; 
+        }
+        
+        /* Progress Bar Styling */
+        .progress-container { 
+            width: 100%; 
+            background-color: #333; 
+            border-radius: 8px; 
+            margin-top: 20px; 
+            display: none; 
+            overflow: hidden;
+        }
+        .progress-bar { 
+            width: 0%; 
+            height: 24px; 
+            background: linear-gradient(90deg, #4CAF50, #66bb6a); 
+            text-align: center; 
+            line-height: 24px; 
+            color: white; 
+            font-size: 14px;
+            font-weight: bold; 
+            transition: width 0.4s ease; 
+        }
+        .status-text { 
+            margin-top: 8px; 
+            color: #ffeb3b; 
+            font-size: 14px; 
+            min-height: 20px;
+        }
+
+        /* Result Area */
+        #vidResultArea {
+            background-color: #252525;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px; /* Alttaki resimden ayırmak için */
+            border: 1px solid #4CAF50;
+        }
+        .download-btn {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .download-btn:hover { background-color: #43a047; }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🚀 SAM 2 AI Studio</h1>
+    <div class="credits">
+        Developed by 
+        <a href="https://github.com/onurkasap" target="_blank">onurkasap</a> 
+        &nbsp;|&nbsp; 
+        <a href="https://github.com/onurkasap/sam2-pro-app" target="_blank">GitHub Repo</a>
+    </div>
+    
+    <div class="tabs">
+        <button class="tab-btn active" onclick="openTab('imageTab')">📷 Image Segmentation</button>
+        <button class="tab-btn" onclick="openTab('videoTab')">🎥 Video Segmentation</button>
+    </div>
+
+    <div id="imageTab" class="tab-content active">
+        <p>Upload an image and click on the object you want to keep.</p>
+        <input type="file" id="imgInput" accept="image/*">
+        <br>
+        <div class="preview-area"><img id="imgDisplay" src="" style="display:none;"></div>
+    </div>
+
+    <div id="videoTab" class="tab-content">
+        <p>Upload a video (Max 20MB), select the object in the first frame.</p>
+        <input type="file" id="vidInput" accept="video/mp4">
+        
+        <div id="progressBox" class="progress-container">
+            <div id="progressBar" class="progress-bar">0%</div>
+        </div>
+        <div id="statusText" class="status-text"></div>
+
+        <div id="vidResultArea" style="display:none;">
+            <h3 style="color:#4CAF50; margin-top:0;">✅ Processing Complete!</h3>
+            <video id="vidOutput" width="100%" controls style="border-radius: 5px; max-height: 500px;"></video>
+            <br>
+            <a id="downloadLink" href="#" download="sam2_result.mp4" class="download-btn">⬇️ Download Result</a>
+        </div>
+
+        <div class="preview-area" id="vidFrameArea" style="display:none;">
+            <p style="background: rgba(0,0,0,0.7); position: absolute; top: 0; left: 0; width: 100%; margin: 0; padding: 5px;">
+                👇 Click on the object to start tracking:
+            </p>
+            <img id="vidFirstFrame" src="">
+        </div>
+    </div>
+</div>
+
+<script>
+    let progressInterval = null;
+
+    // --- Progress Bar Logic ---
+    function startProgressTracking() {
+        if (progressInterval) clearInterval(progressInterval);
+        
+        const pBox = document.getElementById('progressBox');
+        const pBar = document.getElementById('progressBar');
+        const sText = document.getElementById('statusText');
+        
+        pBox.style.display = 'block';
+        
+        progressInterval = setInterval(async () => {
+            try {
+                const res = await fetch('/progress');
+                if (!res.ok) return;
+                
+                const data = await res.json();
+                
+                pBar.style.width = data.percent + '%';
+                pBar.innerText = data.percent + '%';
+                sText.innerText = data.status;
+
+            } catch(e) { console.log("Polling error:", e); }
+        }, 1000);
+    }
+
+    function stopProgressTracking() {
+        if (progressInterval) clearInterval(progressInterval);
+    }
+
+    // --- Tab Logic ---
+    function openTab(id) {
+        document.querySelectorAll('.tab-content').forEach(d => d.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+
+    // --- Image Logic ---
+    const imgInput = document.getElementById('imgInput');
+    const imgDisplay = document.getElementById('imgDisplay');
+    let originalImgFile = null;
+
+    imgInput.onchange = e => {
+        const file = e.target.files[0];
+        if(file){
+            originalImgFile = file;
+            imgDisplay.src = URL.createObjectURL(file);
+            imgDisplay.style.display = 'block';
+        }
+    };
+
+    imgDisplay.onclick = async (e) => {
+        if(!originalImgFile) return;
+        
+        // Basic loading indication for image
+        imgDisplay.style.opacity = "0.5";
+        
+        const rect = imgDisplay.getBoundingClientRect();
+        const scaleX = imgDisplay.naturalWidth / rect.width;
+        const scaleY = imgDisplay.naturalHeight / rect.height;
+        const x = Math.floor((e.clientX - rect.left) * scaleX);
+        const y = Math.floor((e.clientY - rect.top) * scaleY);
+
+        const formData = new FormData();
+        formData.append('file', originalImgFile);
+        formData.append('point_x', x);
+        formData.append('point_y', y);
+
+        try {
+            const res = await fetch('/predict-image', { method: 'POST', body: formData });
+            const data = await res.json();
+            imgDisplay.src = data.image;
+        } catch(err) { alert("Error: " + err); }
+        
+        imgDisplay.style.opacity = "1";
+    };
+
+    // --- Video Logic ---
+    const vidInput = document.getElementById('vidInput');
+    const vidFirstFrame = document.getElementById('vidFirstFrame');
+    
+    vidInput.onchange = async (e) => {
+        const file = e.target.files[0];
+        if(!file) return;
+        
+        // Reset UI
+        document.getElementById('vidResultArea').style.display = 'none';
+        document.getElementById('vidFrameArea').style.display = 'none';
+        
+        startProgressTracking(); 
+        
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const res = await fetch('/upload-video', { method: 'POST', body: formData });
+            if(!res.ok) throw new Error("Upload Failed");
+            const data = await res.json();
+            
+            vidFirstFrame.src = data.first_frame;
+            document.getElementById('vidFrameArea').style.display = 'inline-block';
+            
+        } catch(err) {
+            alert("Error: " + err);
+            stopProgressTracking();
+        }
+    };
+
+    vidFirstFrame.onclick = async (e) => {
+        startProgressTracking();
+        
+        // Görsel geri bildirim (Kullanıcı tıkladığını anlasın)
+        vidFirstFrame.style.cursor = 'wait';
+        document.getElementById('vidFrameArea').style.opacity = '0.6';
+
+        const rect = vidFirstFrame.getBoundingClientRect();
+        const scaleX = vidFirstFrame.naturalWidth / rect.width;
+        const scaleY = vidFirstFrame.naturalHeight / rect.height;
+        const x = Math.floor((e.clientX - rect.left) * scaleX);
+        const y = Math.floor((e.clientY - rect.top) * scaleY);
+
+        const formData = new FormData();
+        formData.append('point_x', x);
+        formData.append('point_y', y);
+
+        try {
+            const res = await fetch('/process-video', { method: 'POST', body: formData });
+            if(!res.ok) throw new Error("Processing Failed");
+            
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+            
+            const vidOutput = document.getElementById('vidOutput');
+            const downloadLink = document.getElementById('downloadLink');
+            const resultArea = document.getElementById('vidResultArea');
+            
+            // Sonuç alanını göster
+            resultArea.style.display = 'block';
+            
+            // Videoyu ayarla
+            vidOutput.src = url;
+            downloadLink.href = url;
+            vidOutput.load();
+            
+            try { await vidOutput.play(); } catch(e) {}
+            
+            // Progress bitir
+            stopProgressTracking();
+            document.getElementById('progressBar').style.width = '100%';
+            document.getElementById('progressBar').innerText = '100%';
+            document.getElementById('statusText').innerText = 'Done!';
+
+            // --- OTOMATİK SCROLL ---
+            // Sayfayı sonucun olduğu yere nazikçe kaydır
+            resultArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        } catch(err) { 
+            alert("Error: " + err); 
+            stopProgressTracking();
+        } finally {
+             // UI'ı eski haline getir
+             vidFirstFrame.style.cursor = 'crosshair';
+             document.getElementById('vidFrameArea').style.opacity = '1';
+        }
+    };
+</script>
+</body>
+</html>
