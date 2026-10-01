@@ -132,11 +132,5 @@ Model dosyası GitHub için çok büyük olduğundan manuel indirmeniz gerekir.
 
 uvicorn app.main:app --reload --port 8000
 
-
-
-## 👨‍💻 Geliştirici / Developer
-
-Developed by **[Adınız Soyadınız]**
-
 * LinkedIn: [Profil Linkiniz]
 * GitHub: [GitHub Profiliniz]
